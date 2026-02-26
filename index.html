@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ManuelExamVault | Secure Academic Storage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
@@ -27,226 +28,252 @@
 
   window.firebaseStorage = { storage, ref, uploadBytes, getDownloadURL };
   window.firebaseDB = { db, collection, addDoc };
-  
-  console.log("ManuelExamVault: Firebase Connected Successfully");
+  console.log("Vault Connected: Academic Integrity Verified.");
 </script>
+
 <body>
     <div id="loginOverlay" class="login-overlay">
         <div class="login-card">
-            <div class="logo">Manuel<span>ExamVault</span></div>
+            <div class="logo">MANUEL<span>VAULT</span></div>
             <h2>Staff Portal</h2>
-            <p>Enter your school credentials to access the vault.</p>
+            <p>Enter your credentials to access the vault.</p>
             <form id="loginForm">
-              <input type="email" id="loginEmail" placeholder="Email (e.g., name@school.edu)" required>
-              <input type="password" id="loginPassword" placeholder="Access Password" required>
-              <button type="submit" class="btn-primary full-width">Sign In</button>
+                <input type="email" id="loginEmail" placeholder="Email Address" required>
+                <input type="password" id="loginPassword" placeholder="Access Password" required>
+                <button type="submit" class="btn-gold-full">Authorize Access</button>
             </form>
-          <p class="login-footer">Protected by ManuelExamVault Security</p>
-      </div>
+        </div>
     </div>
 
     <nav class="navbar">
-        <div class="logo">Manuel<span>ExamVault</span></div>
-        
+        <div class="logo">MANUEL<span>VAULT</span></div>
         <button class="menu-toggle" id="menuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span></span><span></span><span></span>
         </button>
-
         <div class="nav-links" id="navLinks">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it Works</a>
-            <button class="btn-login">Teacher Login</button>
+            <a href="#" class="nav-item active" onclick="switchView('home')">Home</a>
+            <a href="#" class="nav-item" onclick="switchView('upload')">Upload Exam</a>
+            <a href="#" class="nav-item" onclick="switchView('archive')">Archive</a>
+            <a href="#" class="nav-item" onclick="switchView('about')">About</a>
+            <button id="logoutBtn" class="btn-logout" style="display:none;">Sign Out</button>
         </div>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <span class="badge">Trusted by 50+ Departments</span>
-            <h1>The smarter way to <br><span class="gradient-text">submit your exams.</span></h1>
-            <p>A secure, organized digital vault for teachers to upload and archive term questions without the paperwork hassle.</p>
+    <main id="main-content">
+        <section id="home" class="view active">
+            <div class="hero">
+                <div class="hero-content">
+                    <span class="badge">EST. 2026 • OFFICIAL VAULT</span>
+                    <h1>The Smarter Way to <br><span class="gold-text">Archive Excellence.</span></h1>
+                    <p>A secure, military-grade digital repository for teachers to upload and organize term examinations with ease.</p>
+                    <div class="hero-btns">
+                        <button class="btn-gold" onclick="switchView('upload')">Upload Now</button>
+                        <button class="btn-outline" onclick="switchView('archive')">View Vault</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-features">
+                <div class="mini-card">🔒 <span>Encrypted Storage</span></div>
+                <div class="mini-card">📄 <span>Bulk Uploading</span></div>
+                <div class="mini-card">⏰ <span>Automated Logs</span></div>
+            </div>
+        </section>
+
+        <section id="upload" class="view" style="display:none;">
+            <div class="container-small">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2>Vault Examination</h2>
+                        <p>Ensure all fields match the official term guidelines.</p>
+                    </div>
+                    <form id="examUploadForm">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label>Subject</label>
+                                <select required id="subjectSelect">
+                                    <option value="mathematics">Mathematics</option>
+                                    <option value="english">English Language</option>
+                                    <option value="physics">Physics</option>
+                                    <option value="chemistry">Chemistry</option>
+                                    <option value="biology">Biology</option>
+                                    <option value="agricultural-science">Agricultural Science</option>
+                                    <option value="further-mathematics">Further Mathematics</option>
+                                    <option value="economics">Economics</option>
+                                    <option value="commerce">Commerce</option>
+                                    <option value="accounting">Financial Accounting</option>
+                                    <option value="government">Government</option>
+                                    <option value="civic-education">Civic Education</option>
+                                    <option value="literature">Literature in English</option>
+                                    <option value="geography">Geography</option>
+                                    <option value="history">History</option>
+                                    <option value="christian-religious-studies">Christian Religious Studies</option>
+                                    <option value="islamic-religious-studies">Islamic Religious Studies</option>
+                                    <option value="computer-studies">Computer Studies</option>
+                                    <option value="data-processing">Data Processing</option>
+                                    <option value="technical-drawing">Technical Drawing</option>
+                                    <option value="home-economics">Home Economics</option>
+                                    <option value="food-and-nutrition">Food and Nutrition</option>
+                                    <option value="fine-art">Fine Art</option>
+                                    <option value="music">Music</option>
+                                    <option value="physical-education">Physical & Health Education</option>
+                                    <option value="yoruba">Yoruba</option>
+                                    <option value="igbo">Igbo</option>
+                                    <option value="hausa">Hausa</option>
+                                    <option value="french">French</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Class Level</label>
+                                <select required id="classSelect">
+                                    <option>JSS 1</option><option>JSS 2</option><option>JSS 3</option>
+                                    <option>SS 1</option><option>SS 2</option><option>SS 3</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Term</label>
+                                <select required id="termSelect">
+                                    <option value="1">1st Term</option>
+                                    <option value="2">2nd Term</option>
+                                    <option value="3">3rd Term</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Year</label>
+                                <input type="number" value="2026" required id="yearInput">
+                            </div>
+                        </div>
+
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-zone__prompt">
+                                <div class="icon-placeholder">📤</div>
+                                <p>Click to <span>Select PDF</span> or drag file here</p>
+                            </div>
+                            <input type="file" class="drop-zone__input" hidden accept=".pdf,.docx">
+                        </div>
+                        <div class="field signature-area">
+                            <label>Digital Affirmation</label>
+                           <div class="signature-wrapper">
+                              <input type="text" id="teacherSignature" placeholder="Type your Full Name to sign" required>
+                              <p class="signature-disclaimer">By signing, I certify that this examination paper follows the Manuel Secondary School academic guidelines.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-gold-full">Securely Deposit to Vault</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="archive" class="view" style="display:none;">
+            <div class="container">
+                <div class="archive-header-pro">
+                    <h2>Academic Archive</h2>
+                    <input type="text" id="archiveSearch" placeholder="Search by subject, class or year...">
+                </div>
+                <div class="archive-grid" id="archiveBody">
+                    </div>
+            </div>
+        </section>
+
+        <section id="about" class="view" style="display:none;">
+            <div class="container-medium">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <span class="badge">Our Mission</span>
+                        <h2>Digitizing the <span class="gold-text">Academic Legacy</span> of Manuel School</h2>
+                        <p>ManuelExamVault was established in 2026 to solve a critical challenge: the secure management of intellectual property in our school. Every exam paper represents hours of educator expertise; our mission is to ensure those efforts are never lost.</p>
+                
+                       <div class="protocol-list">
+                         <div class="protocol-item">
+                            <strong>01. Secure Ingestion</strong>
+                            <p>Every file is converted to a secure digital format upon upload.</p>
+                          </div>
+                          <div class="protocol-item">
+                            <strong>02. Institutional Access</strong>
+                            <p>Only authorized staff can retrieve archived materials.</p>
+                       </div>
+                    </div>
+                </div>
             
-            <div class="hero-btns">
-                <button class="btn-primary" id="mainUploadBtn">Upload Now</button>
-                <button class="btn-secondary" id="viewArchiveBtn">View My Archives</button>
-            </div>
-        </div>
-    </header>
-
-    <section id="features" class="features">
-        <div class="feature-card">
-            <div class="icon">🔒</div>
-            <h3>End-to-End Encryption</h3>
-            <p>Your exam questions are encrypted the moment you hit upload.</p>
-        </div>
-        <div class="feature-card">
-            <div class="icon">📄</div>
-            <h3>Bulk Upload</h3>
-            <p>Upload exams for all your classes at once with smart sorting.</p>
-        </div>
-        <div class="feature-card">
-            <div class="icon">⏰</div>
-            <h3>Deadline Reminders</h3>
-            <p>Get automated alerts before the submission window closes.</p>
-        </div>
-    </section>
-
-    <div id="uploadModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-              <h2>Upload Exam Paper</h2>
-              <button class="close-modal">&times;</button>
-            </div>
-        
-            <form id="examUploadForm">
-              <div class="form-group">
-                <label>Subject</label>
-                <select required>
-                    <option value="english">English Language</option>
-                    <option value="mathematics">Mathematics</option>
-                    <option value="civic-education">Civic Education</option>
-                    <option value="social-studies">Social Studies</option>
-                    <option value="integrated-science">Integrated Science</option>
-                    <option value="basic-science">Basic Science</option>
-                    <option value="basic-technology">Basic Technology</option>
-                    <option value="physical-health-education">Physical & Health Education</option>
-                    <option value="computer-studies">Computer Studies</option>
-                    <option value="cultural-creative-arts">Cultural & Creative Arts</option>
-                    <option value="business-studies">Business Studies</option>
-                    <option value="security-education">Security Education</option>
-                    <option value="agricultural-science">Agricultural Science</option>
-                    <option value="home-economics">Home Economics</option>
-                    <option value="french">French Language</option>
-                    <option value="yoruba">Yoruba</option>
-                    <option value="igbo">Igbo</option>
-                    <option value="hausa">Hausa</option>
-                    <option value="christian-religious-studies">Christian Religious Studies</option>
-                    <option value="islamic-religious-studies">Islamic Religious Studies</option>
-                    <option value="history">History</option>
-                    <option value="government">Government</option>
-                    <option value="economics">Economics</option>
-                    <option value="commerce">Commerce</option>
-                    <option value="accounting">Financial Accounting</option>
-                    <option value="literature">Literature in English</option>
-                    <option value="biology">Biology</option>
-                    <option value="chemistry">Chemistry</option>
-                    <option value="physics">Physics</option>
-                    <option value="geography">Geography</option>
-                    <option value="technical-drawing">Technical Drawing</option>
-                    <option value="food-nutrition">Food & Nutrition</option>
-                    <option value="clothing-textiles">Clothing & Textiles</option>
-                    <option value="data-processing">Data Processing</option>
-                    <option value="further-mathematics">Further Mathematics</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="entrepreneurship">Entrepreneurship</option>
-                    <option value="animal-husbandry">Animal Husbandry</option>
-                    <option value="fisheries">Fisheries</option>
-                    <option value="tourism">Tourism</option>
-                    <option value="visual-arts">Visual Arts</option>
-                    <option value="music">Music</option>
-                    <option value="auto-mechanics">Auto Mechanics</option>
-                    <option value="electrical-installation">Electrical Installation</option>
-                    <option value="building-construction">Building Construction</option>
-                    <option value="wood-technology">Wood Technology</option>
-                    <option value="metal-work">Metal Work</option>
-                </select>
-              </div>
-
-                <div class="form-group">
-                  <label>Term</label>
-                  <div class="radio-group">
-                      <input type="radio" name="term" value="1" id="t1" required> <label for="t1">1st</label>
-                      <input type="radio" name="term" value="2" id="t2"> <label for="t2">2nd</label>
-                      <input type="radio" name="term" value="3" id="t3"> <label for="t3">3rd</label>
-                 </div> 
+                <div class="about-stats-card">
+                  <div class="stat-box">
+                    <h3>100%</h3>
+                    <p>Paperless Submission</p>
                 </div>
-
-                <div class="drop-zone" id="dropZone">
-                   <div class="drop-zone__prompt">
-                      <div class="icon-placeholder">📤</div>
-                      <p>Drop exam file here or <span>browse computer</span></p>
-                      <p style="font-size: 0.7rem;">PDF, DOCX or PNG (Max 1MB)</p>
-                   </div>
-                   <input type="file" class="drop-zone__input" hidden>
+                <div class="stat-box">
+                    <h3>24/7</h3>
+                    <p>Vault Availability</p>
+                 </div>
+                    <div class="stat-box">
+                      <h3>Secure</h3>
+                      <p>Firebase Encryption</p>
+                     </div>
+                  </div>
                 </div>
-
-              <button type="submit" class="btn-primary full-width">Securely Upload to Vault</button>
-            </form>
-        </div>
-    </div>
-
-    <section id="archive" class="archive-section">
-      <div class="archive-header">
-        <h2>Your Exam Vault</h2>
-        <p>Manage and download your previously submitted term papers.</p>
-     </div>
-
-     <div class="table-container">
-            <table id="archiveTable">
-              <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th>Term</th>
-                    <th>Date Uploaded</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-             </thead>
-             <tbody id="archiveBody">
-                </tbody>
-           </table>
-       </div>
-    </section>
+           </div>
+        </section>
+    </main>
 
     <footer class="main-footer">
-    <div class="footer-grid">
+        <div class="footer-cta">
+         <div class="cta-content">
+            <h2>Ready to secure your records?</h2>
+            <p>Join 50+ educators already using the Manuel digital vault.</p>
+         </div>
+         <button class="btn-gold" onclick="switchView('upload')">Start Uploading</button>
+       </div>
+
+       <div class="footer-grid">
         <div class="footer-brand">
-            <div class="logo">Manuel<span>ExamVault</span></div>
-            <p>Empowering educators with secure, streamlined exam management since 2026.</p>
-            <div class="social-icons">
-                <a href="#">𝕏</a>
-                <a href="#">in</a>
-                <a href="#">fb</a>
+            <div class="logo">MANUEL<span>VAULT</span></div>
+            <p>The official digital examination repository for Manuel Secondary School. Ensuring academic integrity through secure, encrypted storage since 2026.</p>
+            <div class="social-links">
+                <a href="#" aria-label="LinkedIn">in</a>
+                <a href="#" aria-label="Twitter">𝕏</a>
+                <a href="#" aria-label="Support">✉️</a>
             </div>
         </div>
 
         <div class="footer-links">
-            <h4>Platform</h4>
+            <h4>Quick Access</h4>
             <ul>
-                <li><a href="#">Upload Portal</a></li>
-                <li><a href="#">Past Papers</a></li>
-                <li><a href="#">Department Sync</a></li>
+                <li><a href="#" onclick="switchView('home')">Home Dashboard</a></li>
+                <li><a href="#" onclick="switchView('upload')">Vault an Exam</a></li>
+                <li><a href="#" onclick="switchView('archive')">Browse Archive</a></li>
+                <li><a href="#" onclick="switchView('about')">Staff Directory</a></li>
             </ul>
         </div>
 
         <div class="footer-links">
-            <h4>Support</h4>
+            <h4>Guidelines</h4>
             <ul>
-                <li><a href="#">Help Center</a></li>
-                <li><a href="#">IT Support</a></li>
+                <li><a href="#">Submission Deadlines</a></li>
+                <li><a href="#">PDF Formatting Guide</a></li>
                 <li><a href="#">Security Protocols</a></li>
+                <li><a href="#">IT Help Desk</a></li>
             </ul>
         </div>
 
         <div class="footer-newsletter">
-            <h4>Stay Updated</h4>
-            <p>Get notified about submission deadlines.</p>
-            <form class="newsletter-form">
-                <input type="email" placeholder="school-email@edu.com">
-                <button type="submit">Join</button>
+            <h4>Vault Alerts</h4>
+            <p>Get notified when submission windows open.</p>
+            <form class="footer-form">
+                <input type="email" placeholder="Staff Email" required>
+                <button type="submit">OK</button>
             </form>
-        </div>
-      </div>
-    
-      <div class="footer-bottom">
-          <p>&copy; 2026 ManuelExamVault. All rights reserved.</p>
-          <div class="legal">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
           </div>
         </div>
-    </footer>
+
+        <div class="footer-bottom">
+           <p>&copy; 2026 Manuel Secondary School. Internal Staff Use Only.</p>
+         <div class="legal">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Admin Login</a>
+         </div>
+        </div>
+  </footer>
 
     <script src="script.js"></script>
 </body>

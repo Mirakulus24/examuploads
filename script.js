@@ -1,150 +1,154 @@
-// script.js - ManuelExamVault Core Logic (V5.2: Precision Fix)
+// script.js - ManuelExamVault Core Logic (V6.3: Finalized Auth & Navigation)
 
-// --- 1. Teacher Authentication Gatekeeper ---
+// --- 1. Global Configurations ---
+const ADMIN_EMAIL = "principal@manuel.edu";
+
+// --- 2. View Switcher & Mobile Menu Logic ---
+function switchView(sectionId) {
+    document.querySelectorAll('.view').forEach(view => {
+        view.style.display = 'none';
+        view.classList.remove('active');
+    });
+
+    const target = document.getElementById(sectionId);
+    if (target) {
+        target.style.display = 'block';
+        setTimeout(() => target.classList.add('active'), 10);
+    }
+
+    // Nav Link UI Updates
+    document.querySelectorAll('.nav-item, .nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick')?.includes(sectionId)) link.classList.add('active');
+    });
+
+    const navLinks = document.getElementById('navLinks');
+    if (navLinks?.classList.contains('active')) navLinks.classList.remove('active');
+    
+    window.scrollTo(0,0);
+}
+
+// --- 3. Authentication & Logout Logic ---
 const loginOverlay = document.getElementById('loginOverlay');
 const loginForm = document.getElementById('loginForm');
+const logoutBtn = document.getElementById('logoutBtn');
 
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.toLowerCase().trim();
     const pass = document.getElementById('loginPassword').value;
     const loginBtn = loginForm.querySelector('button');
 
     if (email.includes('@') && pass.length >= 6) {
-        loginBtn.innerText = "Authenticating...";
+        const role = (email === ADMIN_EMAIL) ? 'admin' : 'teacher';
+        sessionStorage.setItem('vault_user_role', role);
+        
+        loginBtn.innerText = "Authorizing Vault...";
         loginBtn.disabled = true;
 
         setTimeout(() => {
             loginOverlay.style.opacity = '0';
             setTimeout(() => {
                 loginOverlay.style.display = 'none';
-                initializeApp();
+                
+                // REVEAL LOGOUT BUTTON
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                
+                console.log(`Access Granted: ${role.toUpperCase()} Mode`);
+                loadArchive(); 
             }, 500);
         }, 1200);
     } else {
-        alert("Access Denied. Please use a valid school email and password.");
+        alert("Access Denied. Please use valid school credentials.");
     }
 });
 
-function initializeApp() {
-    console.log("ManuelExamVault: Session Authorized.");
-    loadArchiveFromStorage();
+function handleLogout() {
+    sessionStorage.removeItem('vault_user_role');
+    window.location.reload(); 
 }
 
-// --- 2. Navigation & Mobile Menu Logic ---
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-
-if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-    });
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
 }
 
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (navLinks.classList.contains('active')) {
-            navLinks.classList.remove('active');
-        }
-    });
-});
-
-const navbar = document.querySelector('.navbar');
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        navbar.classList.add('nav-scrolled');
+// --- 4. Initialization (On Page Load) ---
+window.addEventListener('DOMContentLoaded', () => {
+    const role = sessionStorage.getItem('vault_user_role');
+    if (role) {
+        // User is already logged in
+        if (loginOverlay) loginOverlay.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        loadArchive();
     } else {
-        navbar.classList.remove('nav-scrolled');
+        // Ensure vault is locked
+        if (loginOverlay) loginOverlay.style.display = 'flex';
+        if (logoutBtn) logoutBtn.style.display = 'none';
     }
 });
 
-// --- 3. Upload Modal & Fixed Dropzone Logic ---
-const modal = document.getElementById('uploadModal');
-// Use IDs to prevent class conflicts
-const heroUploadBtn = document.getElementById('mainUploadBtn'); 
-const archiveBtn = document.getElementById('viewArchiveBtn');
-const closeBtn = document.querySelector('.close-modal');
+// --- 5. Dropzone Logic ---
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.querySelector('.drop-zone__input');
-const examForm = document.getElementById('examUploadForm');
 
-// Fix: Open Modal
-if (heroUploadBtn) {
-    heroUploadBtn.addEventListener('click', () => { 
-        modal.style.display = 'flex'; 
+if(dropZone) {
+    dropZone.onclick = () => fileInput.click();
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) updateThumbnail(dropZone, fileInput.files[0]);
+    });
+    ["dragover", "dragenter"].forEach(type => {
+        dropZone.addEventListener(type, (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = "var(--gold)";
+            dropZone.style.background = "#fffdf5";
+        });
+    });
+    ["dragleave", "dragend"].forEach(type => {
+        dropZone.addEventListener(type, () => {
+            dropZone.style.borderColor = "#cbd5e1";
+            dropZone.style.background = "#f1f5f9";
+        });
+    });
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            updateThumbnail(dropZone, e.dataTransfer.files[0]);
+        }
     });
 }
-
-if (archiveBtn) {
-    archiveBtn.addEventListener('click', () => {
-        document.getElementById('archive').scrollIntoView({ behavior: 'smooth' });
-    });
-}
-
-closeBtn.onclick = () => modal.style.display = 'none';
-window.onclick = (e) => { if (e.target == modal) modal.style.display = 'none'; };
-
-// Fix: Restore Drag and Drop "Tampered" UI
-dropZone.onclick = () => fileInput.click();
-
-fileInput.addEventListener('change', () => {
-    if (fileInput.files.length) updateThumbnail(dropZone, fileInput.files[0]);
-});
-
-// Add Drag & Drop Listeners
-dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = "var(--brand)";
-    dropZone.style.background = "#f0f4ff";
-});
-
-["dragleave", "dragend"].forEach((type) => {
-    dropZone.addEventListener(type, () => {
-        dropZone.style.borderColor = "#e2e8f0";
-        dropZone.style.background = "transparent";
-    });
-});
-
-dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        updateThumbnail(dropZone, e.dataTransfer.files[0]);
-    }
-});
 
 function updateThumbnail(dropZoneElement, file) {
     let prompt = dropZoneElement.querySelector(".drop-zone__prompt");
     if (prompt) prompt.style.display = 'none';
-    
-    // Clear old displays to prevent duplication
     let oldDisplay = dropZoneElement.querySelector(".file-display");
     if (oldDisplay) oldDisplay.remove();
 
     let display = document.createElement("div");
     display.classList.add("file-display");
     display.innerHTML = `
-        <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
-        <strong>${file.name}</strong>
-        <p style="font-size: 0.75rem; color: #64748b;">${(file.size / 1024).toFixed(1)} KB</p>
+        <div style="font-size: 2rem; margin-bottom: 5px;">📄</div>
+        <strong style="color:var(--navy); font-size:0.9rem;">${file.name}</strong>
+        <p style="font-size: 0.7rem; color: #22c55e; font-weight:bold;">READY TO VAULT</p>
     `;
     dropZoneElement.appendChild(display);
 }
 
-// --- 4. Firestore Submission ---
+// --- 6. Submission Logic ---
+const examForm = document.getElementById('examUploadForm');
+
 examForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const file = fileInput.files[0];
-    const subject = examForm.querySelector('select').value;
-    const termChecked = examForm.querySelector('input[name="term"]:checked');
+    const signature = document.getElementById('teacherSignature').value;
     const submitBtn = examForm.querySelector('button[type="submit"]');
 
-    if (!file || !termChecked) {
-        alert("Please ensure a file and term are selected.");
+    if (!file || !signature) {
+        alert("File and Signature are required.");
         return;
     }
 
-    submitBtn.innerText = "Vaulting to Cloud...";
+    submitBtn.innerText = "Vaulting...";
     submitBtn.disabled = true;
 
     const reader = new FileReader();
@@ -152,66 +156,100 @@ examForm.addEventListener('submit', async (e) => {
     
     reader.onload = async () => {
         const base64File = reader.result;
-        const termText = termChecked.value + (termChecked.value == 1 ? "st" : termChecked.value == 2 ? "nd" : "rd") + " Term";
         const dateString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
+        const examData = {
+            subject: document.getElementById('subjectSelect').value,
+            classLevel: document.getElementById('classSelect').value,
+            term: document.getElementById('termSelect').value + " Term",
+            year: document.getElementById('yearInput').value,
+            signedBy: signature,
+            fileName: file.name,
+            fileUrl: base64File, 
+            date: dateString
+        };
+
         try {
-            const examData = {
-                subject: subject,
-                term: termText,
-                fileName: file.name,
-                fileUrl: base64File, 
-                date: dateString,
-                status: "Verified"
-            };
-
             await window.firebaseDB.addDoc(window.firebaseDB.collection(window.firebaseDB.db, "exams"), examData);
-            saveToLocalStorage(examData);
-            renderArchiveRow(examData);
-
+            saveLocal(examData);
             alert("Exam Securely Vaulted!");
-            modal.style.display = 'none';
             examForm.reset();
             if(dropZone.querySelector(".file-display")) dropZone.querySelector(".file-display").remove();
             dropZone.querySelector(".drop-zone__prompt").style.display = 'block';
-
+            loadArchive();
+            switchView('archive');
         } catch (err) {
             console.error(err);
-            alert("Vault Error. Check Firestore rules.");
+            alert("Vault Error.");
         } finally {
-            submitBtn.innerText = "Securely Upload to Vault";
+            submitBtn.innerText = "Securely Deposit to Vault";
             submitBtn.disabled = false;
         }
     };
 });
 
-// --- 5. Archive & Newsletter (Unchanged) ---
-function renderArchiveRow(data) {
-    const archiveBody = document.getElementById('archiveBody');
-    if (!archiveBody) return;
-    const newRow = document.createElement('tr');
-    const cleanSubject = data.subject.charAt(0).toUpperCase() + data.subject.slice(1);
-    newRow.innerHTML = `
-        <td>${cleanSubject}</td>
-        <td>${data.term}</td>
-        <td>${data.date}</td>
-        <td><span class="status-badge" style="background:#dcfce7; color:#15803d;">${data.status}</span></td>
-        <td><a href="${data.fileUrl}" download="${data.fileName || 'exam-paper'}" class="btn-view" style="text-decoration:none;">Download</a></td>
+// --- 7. Archive Rendering ---
+function renderCard(data, isMasterRecord = false) {
+    const archiveGrid = document.getElementById('archiveBody');
+    const card = document.createElement('div');
+    card.className = 'exam-card';
+    if(isMasterRecord) card.style.borderLeftColor = "#22c55e";
+
+    card.innerHTML = `
+        <div style="display:flex; justify-content:space-between;">
+            <p style="font-size:0.7rem; color:var(--gold); font-weight:bold;">${data.classLevel} • ${data.term}</p>
+            ${isMasterRecord ? '<span style="font-size:0.6rem; background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:10px;">MASTER</span>' : ''}
+        </div>
+        <h3 style="margin: 5px 0; color:var(--navy); font-family:'Playfair Display', serif;">${data.subject.toUpperCase()}</h3>
+        <p style="font-size:0.8rem;">Session: ${data.year}</p>
+        <div style="margin-top:12px; padding:10px; background:#f8fafc; border-radius:6px; border:1px solid #edf2f7;">
+             <p style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Signed By:</p>
+             <p style="font-family:'Playfair Display', serif; font-style:italic; color:var(--navy); font-weight:bold;">${data.signedBy}</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+            <p style="font-size:0.65rem; color:var(--text-muted);">Vaulted: ${data.date}</p>
+            <a href="${data.fileUrl}" download="${data.fileName}" class="btn-download" style="text-decoration:none; font-size:0.75rem; border:1px solid var(--gold); padding:5px 10px; color:var(--gold); border-radius:4px; font-weight:bold;">Download</a>
+        </div>
     `;
-    archiveBody.prepend(newRow);
+    archiveGrid.prepend(card);
 }
 
-function saveToLocalStorage(exam) {
+async function loadArchive() {
+    const archiveGrid = document.getElementById('archiveBody');
+    if(!archiveGrid) return;
+    archiveGrid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:var(--gold);">Syncing Vault...</p>';
+
+    const role = sessionStorage.getItem('vault_user_role');
+
+    if (role === 'admin') {
+        try {
+            const querySnapshot = await window.firebaseDB.getDocs(window.firebaseDB.collection(window.firebaseDB.db, "exams"));
+            archiveGrid.innerHTML = '';
+            querySnapshot.forEach((doc) => renderCard(doc.data(), true));
+        } catch (err) {
+            console.error(err);
+        }
+    } else {
+        let exams = JSON.parse(localStorage.getItem('manuelExams')) || [];
+        archiveGrid.innerHTML = '';
+        if(exams.length === 0) archiveGrid.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No personal records found.</p>';
+        exams.forEach(exam => renderCard(exam, false));
+    }
+}
+
+function saveLocal(exam) {
     let exams = JSON.parse(localStorage.getItem('manuelExams')) || [];
     exams.push(exam);
     localStorage.setItem('manuelExams', JSON.stringify(exams));
 }
 
-function loadArchiveFromStorage() {
-    let exams = JSON.parse(localStorage.getItem('manuelExams')) || [];
-    const archiveBody = document.getElementById('archiveBody');
-    if(archiveBody) {
-        archiveBody.innerHTML = '';
-        exams.forEach(exam => renderArchiveRow(exam));
-    }
+// --- 8. Search ---
+const searchInput = document.getElementById('archiveSearch');
+if(searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.exam-card').forEach(card => {
+            card.style.display = card.innerText.toLowerCase().includes(term) ? 'block' : 'none';
+        });
+    });
 }
