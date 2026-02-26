@@ -593,9 +593,10 @@ select, input[type="number"], input[type="text"], input[type="email"], input[typ
         z-index: 999;
         box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
-
     .nav-links.active {
-        display: flex; 
+        display: flex !important; /* Force visibility */
+        opacity: 1;
+        visibility: visible;
     }
 
     /* Animation: Turn hamburger into an X when active */

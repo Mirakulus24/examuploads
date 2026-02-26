@@ -78,8 +78,6 @@ if (logoutBtn) {
 // --- 4. Initialization (The Mobile Toggle Core) ---
 window.addEventListener('DOMContentLoaded', () => {
     const role = sessionStorage.getItem('vault_user_role');
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
 
     // 1. Check Authentication State
     if (role) {
@@ -91,22 +89,26 @@ window.addEventListener('DOMContentLoaded', () => {
         if (logoutBtn) logoutBtn.style.display = 'none';
     }
 
-    // 2. Mobile Menu Toggle Logic
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navLinks.classList.toggle('active');
-            menuToggle.classList.toggle('is-active'); // For the X animation
-        });
+    // 2. MOBILE MENU CLICK HANDLER (Aggressive Version)
+    document.addEventListener('click', (e) => {
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
 
-        // Close menu if user clicks anywhere outside the nav
-        document.addEventListener('click', (e) => {
-            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        // Check if the user clicked the menu button or one of its spans
+        if (menuToggle && menuToggle.contains(e.target)) {
+            console.log("Menu Clicked!"); // Debugging
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('is-active');
+            e.preventDefault();
+        } 
+        // Close menu if user clicks a link inside or clicks outside
+        else if (navLinks && navLinks.classList.contains('active')) {
+            if (!navLinks.contains(e.target) || e.target.classList.contains('nav-item')) {
                 navLinks.classList.remove('active');
-                menuToggle.classList.remove('is-active');
+                menuToggle?.classList.remove('is-active');
             }
-        });
-    }
+        }
+    });
 });
 
 // --- 5. Dropzone Logic ---
