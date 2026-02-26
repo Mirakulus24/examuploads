@@ -1,4 +1,4 @@
-// script.js - ManuelExamVault Core Logic (V6.3: Finalized Auth & Navigation)
+// script.js - ManuelExamVault Core Logic (V6.5: Final Polish & Mobile Fix)
 
 // --- 1. Global Configurations ---
 const ADMIN_EMAIL = "principal@manuel.edu";
@@ -22,8 +22,13 @@ function switchView(sectionId) {
         if (link.getAttribute('onclick')?.includes(sectionId)) link.classList.add('active');
     });
 
+    // Close mobile menu automatically when a link is clicked
     const navLinks = document.getElementById('navLinks');
-    if (navLinks?.classList.contains('active')) navLinks.classList.remove('active');
+    const menuToggle = document.getElementById('menuToggle');
+    if (navLinks?.classList.contains('active')) {
+        navLinks.classList.remove('active');
+        menuToggle?.classList.remove('is-active');
+    }
     
     window.scrollTo(0,0);
 }
@@ -33,35 +38,33 @@ const loginOverlay = document.getElementById('loginOverlay');
 const loginForm = document.getElementById('loginForm');
 const logoutBtn = document.getElementById('logoutBtn');
 
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value.toLowerCase().trim();
-    const pass = document.getElementById('loginPassword').value;
-    const loginBtn = loginForm.querySelector('button');
+if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.toLowerCase().trim();
+        const pass = document.getElementById('loginPassword').value;
+        const loginBtnEl = loginForm.querySelector('button');
 
-    if (email.includes('@') && pass.length >= 6) {
-        const role = (email === ADMIN_EMAIL) ? 'admin' : 'teacher';
-        sessionStorage.setItem('vault_user_role', role);
-        
-        loginBtn.innerText = "Authorizing Vault...";
-        loginBtn.disabled = true;
+        if (email.includes('@') && pass.length >= 6) {
+            const role = (email === ADMIN_EMAIL) ? 'admin' : 'teacher';
+            sessionStorage.setItem('vault_user_role', role);
+            
+            loginBtnEl.innerText = "Authorizing Vault...";
+            loginBtnEl.disabled = true;
 
-        setTimeout(() => {
-            loginOverlay.style.opacity = '0';
             setTimeout(() => {
-                loginOverlay.style.display = 'none';
-                
-                // REVEAL LOGOUT BUTTON
-                if (logoutBtn) logoutBtn.style.display = 'inline-block';
-                
-                console.log(`Access Granted: ${role.toUpperCase()} Mode`);
-                loadArchive(); 
-            }, 500);
-        }, 1200);
-    } else {
-        alert("Access Denied. Please use valid school credentials.");
-    }
-});
+                loginOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                    if (logoutBtn) logoutBtn.style.display = 'inline-block';
+                    loadArchive(); 
+                }, 500);
+            }, 1200);
+        } else {
+            alert("Access Denied. Please use valid school credentials.");
+        }
+    });
+}
 
 function handleLogout() {
     sessionStorage.removeItem('vault_user_role');
@@ -72,18 +75,37 @@ if (logoutBtn) {
     logoutBtn.addEventListener('click', handleLogout);
 }
 
-// --- 4. Initialization (On Page Load) ---
+// --- 4. Initialization (The Mobile Toggle Core) ---
 window.addEventListener('DOMContentLoaded', () => {
     const role = sessionStorage.getItem('vault_user_role');
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    // 1. Check Authentication State
     if (role) {
-        // User is already logged in
         if (loginOverlay) loginOverlay.style.display = 'none';
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
         loadArchive();
     } else {
-        // Ensure vault is locked
         if (loginOverlay) loginOverlay.style.display = 'flex';
         if (logoutBtn) logoutBtn.style.display = 'none';
+    }
+
+    // 2. Mobile Menu Toggle Logic
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('is-active'); // For the X animation
+        });
+
+        // Close menu if user clicks anywhere outside the nav
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('is-active');
+            }
+        });
     }
 });
 
@@ -137,60 +159,64 @@ function updateThumbnail(dropZoneElement, file) {
 // --- 6. Submission Logic ---
 const examForm = document.getElementById('examUploadForm');
 
-examForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const file = fileInput.files[0];
-    const signature = document.getElementById('teacherSignature').value;
-    const submitBtn = examForm.querySelector('button[type="submit"]');
+if (examForm) {
+    examForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        const signature = document.getElementById('teacherSignature').value;
+        const submitBtn = examForm.querySelector('button[type="submit"]');
 
-    if (!file || !signature) {
-        alert("File and Signature are required.");
-        return;
-    }
-
-    submitBtn.innerText = "Vaulting...";
-    submitBtn.disabled = true;
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    
-    reader.onload = async () => {
-        const base64File = reader.result;
-        const dateString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-
-        const examData = {
-            subject: document.getElementById('subjectSelect').value,
-            classLevel: document.getElementById('classSelect').value,
-            term: document.getElementById('termSelect').value + " Term",
-            year: document.getElementById('yearInput').value,
-            signedBy: signature,
-            fileName: file.name,
-            fileUrl: base64File, 
-            date: dateString
-        };
-
-        try {
-            await window.firebaseDB.addDoc(window.firebaseDB.collection(window.firebaseDB.db, "exams"), examData);
-            saveLocal(examData);
-            alert("Exam Securely Vaulted!");
-            examForm.reset();
-            if(dropZone.querySelector(".file-display")) dropZone.querySelector(".file-display").remove();
-            dropZone.querySelector(".drop-zone__prompt").style.display = 'block';
-            loadArchive();
-            switchView('archive');
-        } catch (err) {
-            console.error(err);
-            alert("Vault Error.");
-        } finally {
-            submitBtn.innerText = "Securely Deposit to Vault";
-            submitBtn.disabled = false;
+        if (!file || !signature) {
+            alert("File and Signature are required.");
+            return;
         }
-    };
-});
+
+        submitBtn.innerText = "Vaulting...";
+        submitBtn.disabled = true;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = async () => {
+            const base64File = reader.result;
+            const dateString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            const examData = {
+                subject: document.getElementById('subjectSelect').value,
+                classLevel: document.getElementById('classSelect').value,
+                term: document.getElementById('termSelect').value + " Term",
+                year: document.getElementById('yearInput').value,
+                signedBy: signature,
+                fileName: file.name,
+                fileUrl: base64File, 
+                date: dateString
+            };
+
+            try {
+                await window.firebaseDB.addDoc(window.firebaseDB.collection(window.firebaseDB.db, "exams"), examData);
+                saveLocal(examData);
+                alert("Exam Securely Vaulted!");
+                examForm.reset();
+                if(dropZone.querySelector(".file-display")) dropZone.querySelector(".file-display").remove();
+                dropZone.querySelector(".drop-zone__prompt").style.display = 'block';
+                loadArchive();
+                switchView('archive');
+            } catch (err) {
+                console.error(err);
+                alert("Vault Error.");
+            } finally {
+                submitBtn.innerText = "Securely Deposit to Vault";
+                submitBtn.disabled = false;
+            }
+        };
+    });
+}
 
 // --- 7. Archive Rendering ---
 function renderCard(data, isMasterRecord = false) {
     const archiveGrid = document.getElementById('archiveBody');
+    if (!archiveGrid) return;
+
     const card = document.createElement('div');
     card.className = 'exam-card';
     if(isMasterRecord) card.style.borderLeftColor = "#22c55e";
