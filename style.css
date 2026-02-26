@@ -1,5 +1,12 @@
-/* style.css */
-/* style.css */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+* {
+    box-sizing: border-box; /* Ensures padding doesn't add to width */
+}
 :root {
     --brand: #6366f1; /* Modern Indigo */
     --brand-dark: #4f46e5;
@@ -101,8 +108,6 @@ body {
     margin-top: 30px;
 }
 
-/* Fix for the "Tampered" Upload Section Appearance */
-./* --- Professional Vault Dropzone --- */
 .drop-zone {
     width: 100%;
     min-height: 180px;
@@ -542,4 +547,37 @@ td {
     margin-top: 20px;
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+@media (max-width: 768px) {
+    /* Prevent large text from pushing the screen width */
+    .hero h1 {
+        font-size: 2.2rem !important; 
+        line-height: 1.2;
+        word-wrap: break-word;
+    }
+
+    .hero p {
+        font-size: 1rem;
+        padding: 0 5%;
+    }
+
+    /* Ensure sections don't have rigid horizontal padding */
+    .hero, .features, .archive-section, .main-footer {
+        padding-left: 5% !important;
+        padding-right: 5% !important;
+        width: 100%;
+    }
+
+    /* Force the table container to stay within bounds */
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Allows table to scroll WITHOUT shaking the whole site */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Prevent images or icons from overflowing */
+    img, svg {
+        max-width: 100%;
+        height: auto;
+    }
 }
