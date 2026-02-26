@@ -1,4 +1,4 @@
-// script.js - ManuelExamVault Core Logic (V5: Plan B - Free Firestore Tier)
+// script.js - ManuelExamVault Core Logic (V5.1: Final Mobile + Free Tier Build)
 
 // --- 1. Teacher Authentication Gatekeeper ---
 const loginOverlay = document.getElementById('loginOverlay');
@@ -31,7 +31,7 @@ function initializeApp() {
     loadArchiveFromStorage();
 }
 
-// --- 2. Navigation & Mobile Menu ---
+// --- 2. Navigation & Mobile Menu Logic ---
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 
@@ -40,6 +40,15 @@ if (menuToggle) {
         navLinks.classList.toggle('active');
     });
 }
+
+// Auto-close menu when a link is clicked (Fixes mobile experience)
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+        }
+    });
+});
 
 const navbar = document.querySelector('.navbar');
 window.addEventListener('scroll', () => {
@@ -50,13 +59,13 @@ window.addEventListener('scroll', () => {
     }
 });
 
+// Smooth Scroll Logic
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
             target.scrollIntoView({ behavior: 'smooth' });
-            if (navLinks.classList.contains('active')) navLinks.classList.remove('active');
         }
     });
 });
@@ -106,12 +115,12 @@ examForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    if (file.size > 1048576) { // 1MB Limit for Firestore Documents
-        alert("File too large! Please keep exams under 1MB for the free vault.");
+    if (file.size > 1048576) { 
+        alert("File too large! Keep exams under 1MB for the free vault.");
         return;
     }
 
-    submitBtn.innerText = "Processing Cloud Vault...";
+    submitBtn.innerText = "Vaulting to Cloud...";
     submitBtn.disabled = true;
 
     const reader = new FileReader();
@@ -123,19 +132,18 @@ examForm.addEventListener('submit', async (e) => {
         const dateString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
         try {
-            // Save to Firestore Database
             const examData = {
                 subject: subject,
                 term: termText,
                 fileName: file.name,
-                fileUrl: base64File, // Data string stored as URL
+                fileUrl: base64File, 
                 date: dateString,
                 status: "Verified"
             };
 
+            // Save to Firestore Database
             await window.firebaseDB.addDoc(window.firebaseDB.collection(window.firebaseDB.db, "exams"), examData);
 
-            // Save locally for persistence and update UI
             saveToLocalStorage(examData);
             renderArchiveRow(examData);
 
@@ -182,7 +190,7 @@ function saveToLocalStorage(exam) {
 function loadArchiveFromStorage() {
     let exams = JSON.parse(localStorage.getItem('manuelExams')) || [];
     const archiveBody = document.getElementById('archiveBody');
-    if(archiveBody && exams.length > 0) {
+    if(archiveBody) {
         archiveBody.innerHTML = '';
         exams.forEach(exam => renderArchiveRow(exam));
     }

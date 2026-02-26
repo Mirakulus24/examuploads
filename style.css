@@ -58,40 +58,6 @@ body {
     font-weight: 600;
     cursor: pointer;
 }
-
-/* Mobile Menu Toggle Icon */
-.menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-}
-
-.menu-toggle span {
-    width: 25px;
-    height: 3px;
-    background: var(--dark);
-    border-radius: 2px;
-}
-
-/* Media Query for Mobile (max 768px) */
-@media (max-width: 768px) {
-    .menu-toggle { display: flex; }
-
-    .nav-links {
-        display: none; /* Hide links initially */
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-    }
-
-    .nav-links.active { display: flex; }
-
     .hero h1 { font-size: 2.5rem; }
     
     .footer-grid {
@@ -437,4 +403,37 @@ td {
     margin-top: 20px;
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+/* Ensure the hamburger icon is styled */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background: #2563eb;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle { display: flex; }
+    .nav-links {
+        display: none; /* JavaScript will add 'active' to change this to flex */
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .nav-links.active { display: flex; }
 }
