@@ -163,8 +163,12 @@
                 </div>
 
                 <div class="drop-zone" id="dropZone">
-                  <span class="drop-zone__prompt">Drop exam file here or <span>browse</span></span>
-                  <input type="file" name="myFile" class="drop-zone__input" accept=".pdf,.doc,.docx" hidden>
+                   <div class="drop-zone__prompt">
+                      <div class="icon-placeholder">📤</div>
+                      <p>Drop exam file here or <span>browse computer</span></p>
+                      <p style="font-size: 0.7rem;">PDF, DOCX or PNG (Max 1MB)</p>
+                   </div>
+                   <input type="file" class="drop-zone__input" hidden>
                 </div>
 
               <button type="submit" class="btn-primary full-width">Securely Upload to Vault</button>

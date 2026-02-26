@@ -1,4 +1,5 @@
 /* style.css */
+/* style.css */
 :root {
     --brand: #6366f1; /* Modern Indigo */
     --brand-dark: #4f46e5;
@@ -20,7 +21,7 @@ body {
     line-height: 1.6;
 }
 
-/* Navbar */
+/* --- Navbar (Enhanced for Desktop & Mobile) --- */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -31,14 +32,15 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    transition: all 0.4s ease; /* Smooth transition for color and shadow */
+    transition: all 0.4s ease;
 }
 
 .nav-scrolled {
     background: rgba(255, 255, 255, 0.95) !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    padding: 1rem 10% !important; /* Shrinks the navbar slightly on scroll */
+    padding: 1rem 10% !important;
 }
+
 .logo {
     font-weight: 800;
     font-size: 1.5rem;
@@ -46,6 +48,23 @@ body {
 }
 
 .logo span {
+    color: var(--brand);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
     color: var(--brand);
 }
 
@@ -57,18 +76,104 @@ body {
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-}
-    .hero h1 { font-size: 2.5rem; }
-    
-    .footer-grid {
-        grid-template-columns: 1fr; /* Stack footer columns */
-    }
+    transition: 0.3s;
 }
 
-/* Hero Section */
+.btn-login:hover {
+    background: var(--brand);
+    color: white;
+}
+
+/* --- Hero Section --- */
 .hero {
+    position: relative;
+    z-index: 1; /* Ensures it sits above background blobs but below the navbar */
     padding: 120px 10% 80px;
     text-align: center;
+}
+
+.hero-btns {
+    position: relative;
+    z-index: 10; /* Brings buttons to the very front */
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* Fix for the "Tampered" Upload Section Appearance */
+./* --- Professional Vault Dropzone --- */
+.drop-zone {
+    width: 100%;
+    min-height: 180px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.drop-zone:hover {
+    border-color: var(--brand);
+    background: #f0f4ff;
+    transform: translateY(-2px);
+}
+
+.drop-zone__prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-muted);
+}
+
+.drop-zone__prompt i, .drop-zone__prompt .icon-placeholder {
+    font-size: 2.5rem;
+    color: var(--brand);
+    opacity: 0.8;
+}
+
+.drop-zone__prompt span {
+    font-weight: 600;
+    color: var(--brand);
+    text-decoration: underline;
+}
+
+/* --- Professional File Preview --- */
+.file-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.file-display strong {
+    color: var(--text-main);
+    font-size: 1rem;
+    margin-top: 8px;
+    word-break: break-all;
+}
+
+.file-display p {
+    color: #22c55e; /* Success Green */
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .badge {
@@ -100,7 +205,7 @@ body {
     margin: 20px auto 40px;
 }
 
-/* Buttons */
+/* --- Buttons --- */
 .btn-primary {
     background: var(--brand);
     color: white;
@@ -124,7 +229,7 @@ body {
     cursor: pointer;
 }
 
-/* Features Section */
+/* --- Features & Modal (Your Original Styles) --- */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -140,16 +245,8 @@ body {
     transition: transform 0.3s ease;
 }
 
-.feature-card:hover {
-    transform: translateY(-10px);
-}
+.feature-card:hover { transform: translateY(-10px); }
 
-.feature-card .icon {
-    font-size: 2rem;
-    margin-bottom: 15px;
-}
-
-/* Modal Overlay */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -158,7 +255,7 @@ body {
     height: 100%;
     background: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(8px);
-    display: none; /* Hidden by default */
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 2000;
@@ -170,49 +267,91 @@ body {
     border-radius: 24px;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
+/* --- Archive Section --- */
+.archive-section {
+    padding: 80px 10%;
+    background: white;
 }
 
-.close-modal {
+.table-container {
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 18px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* --- Responsive Menu Toggle --- */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
     background: none;
     border: none;
-    font-size: 2rem;
     cursor: pointer;
-    color: var(--text-muted);
 }
 
-/* Form Styling */
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
-
-select, .drop-zone {
-    width: 100%;
-    padding: 12px;
-    border: 2px dashed #e2e8f0;
-    border-radius: 12px;
+.menu-toggle span {
+    width: 25px;
+    height: 3px;
+    background: var(--brand);
+    border-radius: 5px;
 }
 
-.drop-zone {
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-bottom: 25px;
+/* --- Media Queries (Mobile Fixes) --- */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .nav-links {
+        display: none; /* JavaScript flips this to active */
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        padding: 30px;
+        gap: 20px;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-secondary {
+        margin-left: 0;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
 }
-
-.drop-zone:hover { border-color: var(--brand); background: #f0f4ff; }
-
-.full-width { width: 100%; margin-top: 10px; }
-
 /* Footer Styles */
 .main-footer {
     background: #0f172a; /* Dark Navy */
@@ -403,37 +542,4 @@ td {
     margin-top: 20px;
     font-size: 0.8rem;
     color: var(--text-muted);
-}
-
-/* Ensure the hamburger icon is styled */
-.menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.menu-toggle span {
-    width: 25px;
-    height: 3px;
-    background: #2563eb;
-    border-radius: 5px;
-}
-
-@media (max-width: 768px) {
-    .menu-toggle { display: flex; }
-    .nav-links {
-        display: none; /* JavaScript will add 'active' to change this to flex */
-        position: absolute;
-        top: 70px;
-        left: 0;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 20px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .nav-links.active { display: flex; }
 }
